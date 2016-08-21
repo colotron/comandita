@@ -25,6 +25,8 @@
 #include <msp430.h>
 #include "uart.h"
 #include "fifo.h"
+#include "myAssert.h"
+#include "led.h"
 
 /*
  *
@@ -46,24 +48,13 @@ note over main: continue
 
 void appRun(void) ;
 void Setup(void) ;
-unsigned int Test(void) ;
-
-void LedToggle(void) ;
-void LedOn(void) ;
-void LedOff(void) ;
-
+void Test(void) ;
 
 int main(void) {
 	Setup();
 
 	LedOff() ;
-	if ( 0 != Test() ) {
-		while(1) {
-			LedToggle();
-			__delay_cycles(100000);
-			__nop();
-		}
-	}
+	Test();
 
 	while(1) {
 		if ( UartCharacterArrived() ) {
@@ -93,31 +84,15 @@ void appRun(void) {
 	__nop();
 }
 
-unsigned int Test(void) {
-	return FifoTest();
+void Test(void) {
+	unsigned int a = 5;
+	FifoTest();
 }
 
 ///----------------------------------------------------------------------
 void WatchdogSetup(void) {
 	WDTCTL = WDTPW + WDTHOLD;                 // Stop WDT
 }
-
-void LedSetup(void) {
-	P1DIR |= BIT0;
-}
-
-void LedToggle(void) {
-	P1OUT ^= BIT0;
-}
-
-void LedOn(void) {
-	P1OUT |= BIT0;
-}
-
-void LedOff(void) {
-	P1OUT &= ~BIT0;
-}
-
 
 void ClockSetup(void) {
 	if (CALBC1_1MHZ==0xFF) {				// If calibration constant erased
