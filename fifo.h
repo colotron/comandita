@@ -13,7 +13,7 @@ typedef unsigned int fifoIndex_t;
 
 typedef struct fifo_s {
 	fifoElement_t *buffer;
-	fifoIndex_t readIndex, writeIndex, count;
+	fifoIndex_t readIndex, writeIndex;
 	const unsigned int size;
 } fifo_t;
 
@@ -25,7 +25,6 @@ typedef fifo_t *fifo_p;
 			.readIndex = 0,\
 			.writeIndex = 0, \
 			.size = FIFO_SIZE, \
-			.count =0, \
 	};
 
 void FifoPut ( fifoElement_t value, fifo_p fifo ) ;
