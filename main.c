@@ -13,16 +13,16 @@
  * mem read 0x1234: leer posición de memoria 0x1234
  * mem write 0x1234 100: escribir posición de memoria 0x1234 con el valor 100
  *
- * 	Recibir cadena de texto por puerto serie uart
- * 		Recibir caracter por puerto uart <---
+ * 	Recibir cadena de texto por puerto serie uart <---
+ * 		Recibir caracter por puerto uart [hecho]
  * 			Configurar modulo uart	[hecho]
  * 			Configuramos reloj sistema/watchdog [hecho]
  * 			Recibimos caracteres en forma secuencial [hecho]
- * 			Recibir caracteres a traves de interrupción uart rx <---
+ * 			Recibir caracteres a traves de interrupción uart rx [hecho]
  *
  */
 
-#include <msp430.h>
+#include "common.h"
 #include "uart.h"
 #include "fifo.h"
 #include "myAssert.h"
@@ -59,8 +59,15 @@ int main(void) {
 	__enable_interrupt();
 
 	while(1) {
-		if ( UartCharacterArrived() ) {
-			UartWrite( UartRead() );	//echo
+		if ( UartPendingInput() ) {
+			UartRead();
+			UartWrite( 'H' );
+			UartWrite( 'o' );
+			UartWrite( 'l' );
+			UartWrite( 'a' );
+			UartWrite( '\r' );
+			UartWrite( '\n' );
+			UartTxStart();
 			LedToggle();
 		}
 

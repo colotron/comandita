@@ -5,15 +5,45 @@
  *      Author: daniel
  */
 
-#include <msp430.h>
+#include "common.h"
 #include "fifo.h"
+#include "myAssert.h"
 
 #define UART_INPUT_BUFFER_SIZE	80U
+#define UART_OUTPUT_BUFFER_SIZE	UART_INPUT_BUFFER_SIZE
 
 static fifoElement_t uartInputBuffer[UART_INPUT_BUFFER_SIZE];
+FIFO_DECLARE(uartFifoRx, uartInputBuffer, UART_INPUT_BUFFER_SIZE);
 
-FIFO_DECLARE(uartFifo, uartInputBuffer, UART_INPUT_BUFFER_SIZE);
+static fifoElement_t uartOutputBuffer[UART_OUTPUT_BUFFER_SIZE];
+FIFO_DECLARE(uartFifoTx, uartOutputBuffer, UART_OUTPUT_BUFFER_SIZE);
 
+unsigned int UartPendingInput(void) {
+	return FifoCount(&uartFifoRx);
+}
+
+char UartRead(void) {
+	return FifoTake(&uartFifoRx);
+}
+
+void UartWrite(char tx){
+	FifoPut(tx, &uartFifoTx);
+}
+
+static unsigned int UartTxInterruptEnabled(void) ;
+static void UartEnableTxInterrupt(void) ;
+void UartSendByte(char c) ;
+
+void UartTxStart(void){
+	if ( 0 == UartTxInterruptEnabled() ) {
+		if ( 0 != FifoCount(&uartFifoTx) ) {
+			UartSendByte( FifoTake(&uartFifoTx) );
+			UartEnableTxInterrupt();
+		}
+	}
+}
+
+//----------------------------------------
 void UartSetup(void) {
 	P1SEL = BIT1 + BIT2 ;                     // P1.1 = RXD, P1.2=TXD
 	P1SEL2 = BIT1 + BIT2 ;                    // P1.1 = RXD, P1.2=TXD
@@ -26,22 +56,42 @@ void UartSetup(void) {
 	IE2 |= UCA0RXIE;                          // Enable USCI_A0 RX interrupt
 }
 
-unsigned int UartCharacterArrived(void) {
-	return (IFG2 & UCA0RXIFG);
+void UartSendByte(char c) {
+	UCA0TXBUF = c;
 }
 
-char UartRead(void) {
+char UartReadReceivedByte(void) {
 	return UCA0RXBUF;
 }
 
-void UartWrite(char tx){
-	while (!(IFG2&UCA0TXIFG));                // USCI_A0 TX buffer ready?
-	UCA0TXBUF = tx;
+static unsigned int UartTxInterruptEnabled(void) {
+	return (IE2 & UCA0TXIE);
+}
+
+static void UartEnableTxInterrupt(void) {
+	IE2 |= UCA0TXIE;         // Enable USCI_A0 TX interrupt
 }
 
 
-void __attribute__ ((interrupt(USCIAB0RX_VECTOR))) USCI0RX_ISR (void) {
-	while (!(IFG2&UCA0TXIFG));                // USCI_A0 TX buffer ready?
-	UCA0TXBUF = UCA0RXBUF;                    // TX -> RXed character
+static void UartDisableTxInterrupt(void) {
+	 IE2 &= ~UCA0TXIE;                       // Disable USCI_A0 TX interrupt
+}
+
+ISR(USCIAB0RX_VECTOR) void UartCharReceivedInterrupt (void) ;
+
+//void __attribute__ ((interrupt(USCIAB0RX_VECTOR))) UartRxCharInterrupt (void) {
+void UartCharReceivedInterrupt (void) {
+	FifoPut(UartReadReceivedByte(), &uartFifoRx);
+}
+
+ISR(USCIAB0TX_VECTOR) void UartReadyToTransmitInterrupt (void) ;
+
+//void __attribute__ ((interrupt(USCIAB0TX_VECTOR))) USCI0TX_ISR (void) {
+void UartReadyToTransmitInterrupt (void) {
+	if( FifoCount(&uartFifoTx) ) {
+		UartSendByte (FifoTake(&uartFifoTx) );
+	} else {
+		UartDisableTxInterrupt();
+	}
 }
 

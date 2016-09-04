@@ -47,7 +47,7 @@ unsigned int FifoSize(fifo_p fifo) {
 
 //---------------------------------------------------------------------
 
-void FifoTestPut1(fifo_p fifo) {
+static void FifoTestPut1(fifo_p fifo) {
 	unsigned int value = 10;
 	unsigned int previousCount = FifoCount(fifo);
 
@@ -57,7 +57,7 @@ void FifoTestPut1(fifo_p fifo) {
 	ASSERT(FifoCount(fifo) == (previousCount + 1 ) ); //evaluate test result
 }
 
-void FifoTestTake1(fifo_p fifo) {
+static void FifoTestTake1(fifo_p fifo) {
 	unsigned int previousCount = FifoCount(fifo);
 
 	ASSERT(FifoCount(fifo) > 0);	//verify test pre-conditions
@@ -67,7 +67,7 @@ void FifoTestTake1(fifo_p fifo) {
 	ASSERT(FifoCount(fifo) == (previousCount - 1 ) ); //examine test results
 }
 
-void FifoTestPut1Take1(fifo_p fifo) {
+static void FifoTestPut1Take1(fifo_p fifo) {
 	const unsigned oldFifoCount = FifoCount(fifo);
 	const unsigned int fifoValue = 5;
 
@@ -77,7 +77,7 @@ void FifoTestPut1Take1(fifo_p fifo) {
 	ASSERT(oldFifoCount == FifoCount(fifo));
 }
 
-void FifoTestRollOver(fifo_p fifo) {
+static void FifoTestRollOver(fifo_p fifo) {
 	unsigned int i;
 
 	FifoReset(fifo);

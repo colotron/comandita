@@ -5,16 +5,20 @@
  *      Author: daniel
  */
 
+
+#include "common.h"
 #include "led.h"
 
 void AssertFailure(void) {
 	volatile unsigned int continueBlocking = 1;
 
+	DisableInterrupts();
 	while (continueBlocking) {
 		LedToggle();
-		__delay_cycles(100000);
-		__nop();
+		Delay(100000);
+		Nop();
 	}
+	EnableInterrupts();
 }
 
 

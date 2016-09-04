@@ -28,14 +28,14 @@ typedef fifo_t *fifo_p;
 			.count = 0, \
 	};
 
-void FifoPut ( fifoElement_t value, fifo_p fifo ) ;
+extern void FifoPut ( fifoElement_t value, fifo_p fifo ) ;
 
-fifoElement_t FifoTake(fifo_p fifo) ;
+extern fifoElement_t FifoTake(fifo_p fifo) ;
 
-unsigned int FifoSize(fifo_p fifo) ;
-void FifoReset(fifo_p fifo) ;
-fifoIndex_t FifoCount(fifo_p fifo) ;
+extern unsigned int FifoSize(fifo_p fifo) ;
+extern void FifoReset(fifo_p fifo) ;
+extern fifoIndex_t FifoCount(fifo_p fifo) ;
 
-void FifoTest(void) ;
+extern void FifoTest(void) ;
 
 #endif /* FIFO_H_ */

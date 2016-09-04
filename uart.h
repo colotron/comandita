@@ -8,11 +8,12 @@
 #ifndef UART_H_
 #define UART_H_
 
-void UartSetup(void) ;
+extern void UartSetup(void) ;
 
-unsigned int UartCharacterArrived(void) ;
-char UartRead(void) ;
-void UartWrite(char tx) ;
+extern unsigned int UartPendingInput(void) ;
+extern char UartRead(void) ;
+extern void UartWrite(char tx) ;
+extern void UartTxStart(void) ;
 
 
 #endif /* UART_H_ */
