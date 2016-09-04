@@ -35,13 +35,13 @@ char UartRead(void) {
 }
 
 void UartWrite(char tx){
+	while (!(IFG2&UCA0TXIFG));                // USCI_A0 TX buffer ready?
 	UCA0TXBUF = tx;
 }
 
 
-void __attribute__ ((interrupt(USCIAB0RX_VECTOR))) USCI0RX_ISR (void)
-{
-  while (!(IFG2&UCA0TXIFG));                // USCI_A0 TX buffer ready?
-  UCA0TXBUF = UCA0RXBUF;                    // TX -> RXed character
+void __attribute__ ((interrupt(USCIAB0RX_VECTOR))) USCI0RX_ISR (void) {
+	while (!(IFG2&UCA0TXIFG));                // USCI_A0 TX buffer ready?
+	UCA0TXBUF = UCA0RXBUF;                    // TX -> RXed character
 }
 

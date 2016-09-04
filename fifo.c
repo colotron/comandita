@@ -103,7 +103,6 @@ void FifoTestRollOver(fifo_p fifo) {
 }
 
 void FifoTest(void) {
-	unsigned int testResult ;
 	unsigned int buffer[4] ;
 	FIFO_DECLARE(testFifo, buffer, sizeof(buffer)/sizeof(unsigned int) );
 

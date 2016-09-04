@@ -56,6 +56,8 @@ int main(void) {
 	LedOff() ;
 	Test();
 
+	__enable_interrupt();
+
 	while(1) {
 		if ( UartCharacterArrived() ) {
 			UartWrite( UartRead() );	//echo
@@ -85,7 +87,6 @@ void appRun(void) {
 }
 
 void Test(void) {
-	unsigned int a = 5;
 	FifoTest();
 }
 
