@@ -8,7 +8,7 @@
 #ifndef FIFO_H_
 #define FIFO_H_
 
-typedef unsigned int fifoElement_t;
+typedef char fifoElement_t;
 typedef unsigned int fifoIndex_t;
 
 typedef struct fifo_s {

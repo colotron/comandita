@@ -16,11 +16,11 @@ void LedToggle(void) {
 	P1OUT ^= BIT0;
 }
 
-void LedOn(void) {
+void LedOff(void) {
 	P1OUT |= BIT0;
 }
 
-void LedOff(void) {
+void LedOn(void) {
 	P1OUT &= ~BIT0;
 }
 

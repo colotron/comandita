@@ -15,5 +15,8 @@ extern char UartRead(void) ;
 extern void UartWrite(char tx) ;
 extern void UartTxStart(void) ;
 
+extern void UartWriteString(char *stringToSend);
+extern char * UartReadString(void) ;
+
 
 #endif /* UART_H_ */

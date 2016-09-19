@@ -14,6 +14,8 @@
  * mem write 0x1234 100: escribir posición de memoria 0x1234 con el valor 100
  *
  * 	Recibir cadena de texto por puerto serie uart <---
+ * 		Detectar que se pulsa la tecla enter, hacer un eco de la cadena completa.
+ *
  * 		Recibir caracter por puerto uart [hecho]
  * 			Configurar modulo uart	[hecho]
  * 			Configuramos reloj sistema/watchdog [hecho]
@@ -27,6 +29,7 @@
 #include "fifo.h"
 #include "myAssert.h"
 #include "led.h"
+#include <string.h>
 
 /*
  *
@@ -56,19 +59,39 @@ int main(void) {
 	LedOff() ;
 	Test();
 
-	__enable_interrupt();
+	EnableInterrupts();
 
 	while(1) {
 		if ( UartPendingInput() ) {
-			UartRead();
-			UartWrite( 'H' );
-			UartWrite( 'o' );
-			UartWrite( 'l' );
-			UartWrite( 'a' );
-			UartWrite( '\r' );
-			UartWrite( '\n' );
+			char newCharacter =	UartRead();
+			if ( ( '\r' == newCharacter ) || ( '\n' == newCharacter ) ) {
+				char *inputString = UartReadString();
+				char *outputString;
+				UartWrite( '\r' );
+				UartWrite( '\n' );
+				UartWrite( '>' );
+
+				if ( 0 == strncasecmp( inputString, "LED ON", strlen("LED ON")  ) ) {
+					LedOn();
+					outputString = "Led set on";
+				} else if ( 0 == strncasecmp( inputString, "LED OFF", strlen("LED OFF")) ) {
+					LedOff();
+					outputString = "Led set off";
+				} else if ( 0 == strncasecmp( inputString, "LED TOGGLE", strlen("LED TOGGLE") ) ) {
+					LedToggle();
+					outputString = "Led set toggle";
+				} else {
+					outputString = "Unknown command";
+				}
+
+				UartWriteString( outputString );
+				UartWrite( '\r' );
+				UartWrite( '\n' );
+			}
+			else {
+				UartWrite( newCharacter );
+			}
 			UartTxStart();
-			LedToggle();
 		}
 
 		//Resto de aplicación, ejemplo
@@ -90,7 +113,7 @@ void Setup(void) {
 
 
 void appRun(void) {
-	__nop();
+	Nop();
 }
 
 void Test(void) {

@@ -30,6 +30,19 @@ void UartWrite(char tx){
 	FifoPut(tx, &uartFifoTx);
 }
 
+void UartWriteString(char *stringToSend) {
+	while( *stringToSend != '\0' ) {
+		UartWrite(*stringToSend);
+		stringToSend++;
+	}
+}
+
+char * UartReadString(void) {
+	FifoPut('\0', &uartFifoRx);
+	FifoReset(&uartFifoRx);
+	return uartFifoRx.buffer;
+}
+
 static unsigned int UartTxInterruptEnabled(void) ;
 static void UartEnableTxInterrupt(void) ;
 void UartSendByte(char c) ;
